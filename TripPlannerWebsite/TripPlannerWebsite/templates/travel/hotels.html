@@ -1,0 +1,40 @@
+{% extends "travel/base.html" %}
+
+{% block title %}Hotels | TravelMate{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">Hotel booking</p>
+    <h1>Choose your stay</h1>
+    <div class="client-tools">
+        <input type="search" placeholder="Search hotel or city" data-card-search>
+        <select data-card-sort>
+            <option value="default">Recommended</option>
+            <option value="price-low">Price low to high</option>
+            <option value="name">Name A to Z</option>
+        </select>
+    </div>
+</section>
+
+<section class="section">
+    <div class="listing-grid" data-filter-grid>
+        {% for hotel in hotels %}
+            <article class="listing-card" data-search-text="{{ hotel.name }} {{ hotel.destination.name }} {{ hotel.amenities }} {{ hotel.address }}" data-name="{{ hotel.name }}" data-price="{{ hotel.price_per_night }}">
+                <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}">
+                <div class="listing-body">
+                    <h3>{{ hotel.name }}</h3>
+                    <p>{{ hotel.address }}</p>
+                    <p>{{ hotel.destination.name }} - {{ hotel.star_rating }} star - {{ hotel.rooms_available }} rooms left</p>
+                    <p>{{ hotel.amenities }}</p>
+                    <strong data-price-value="{{ hotel.price_per_night }}">INR {{ hotel.price_per_night }} / night</strong>
+                    <div class="card-actions">
+                        <a href="{% url 'hotel_detail' hotel.pk %}">View details</a>
+                        <a href="{% url 'book_trip' %}">Request booking</a>
+                        <button type="button" data-save-trip="{{ hotel.name }}">Save</button>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

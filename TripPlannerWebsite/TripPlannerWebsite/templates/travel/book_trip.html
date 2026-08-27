@@ -1,0 +1,31 @@
+{% extends "travel/base.html" %}
+
+{% block title %}Book Trip | TravelMate{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">Booking request</p>
+    <h1>Send your trip details</h1>
+    <p class="page-copy">The form adjusts itself based on the booking type and gives a quick summary before submitting.</p>
+</section>
+
+<section class="form-section">
+    <aside class="booking-helper">
+        <h2>Booking Summary</h2>
+        <p data-booking-summary>Select a booking type, destination, and travel date to build your request.</p>
+    </aside>
+    <form class="booking-form" method="post" data-booking-form>
+        {% csrf_token %}
+        {% for field in form %}
+            <label class="{% if field.name == 'special_request' %}full-width{% endif %}">
+                <span>{{ field.label }}</span>
+                {{ field }}
+                {% if field.errors %}
+                    <small>{{ field.errors|striptags }}</small>
+                {% endif %}
+            </label>
+        {% endfor %}
+        <button type="submit">Submit Booking Request</button>
+    </form>
+</section>
+{% endblock %}

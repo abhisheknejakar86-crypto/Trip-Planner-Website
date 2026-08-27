@@ -1,0 +1,12 @@
+{% extends "travel/base.html" %}
+
+{% block title %}Booking Submitted | TravelMate{% endblock %}
+
+{% block content %}
+<section class="success-panel">
+    <p class="eyebrow">Request received</p>
+    <h1>Your trip request is saved.</h1>
+    <p>Our travel desk will review the details and contact you with the next steps.</p>
+    <a class="primary-link" href="{% url 'home' %}">Plan another trip</a>
+</section>
+{% endblock %}

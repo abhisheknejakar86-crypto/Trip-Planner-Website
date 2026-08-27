@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TravelMate{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="{% static 'travel/css/styles.css' %}">
+    <script src="{% static 'travel/js/app.js' %}" defer></script>
+</head>
+<body data-user-key="{% if user.is_authenticated %}{{ user.username }}{% else %}guest{% endif %}">
+    <div class="scroll-progress" data-scroll-progress></div>
+    <header class="site-header">
+        <nav class="navbar">
+            <a class="brand brand-mark" href="{% url 'home' %}">
+                <img src="{% static 'travel/img/logo.svg' %}" alt="TravelMate logo">
+                <span>TravelMate</span>
+            </a>
+            <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+                Menu
+            </button>
+            <div class="nav-links" id="site-menu" data-site-menu>
+                <a href="{% url 'home' %}">Explore</a>
+                <a href="{% url 'hotels' %}">Hotels</a>
+                <a href="{% url 'transport' %}">Travel</a>
+                <a href="{% url 'packages' %}">Packages</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'history' %}">My History</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                    <a class="nav-button" href="{% url 'book_trip' %}">Book Now</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a class="nav-button" href="{% url 'signup' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content" style="max-width: 1180px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+            <div class="footer-brand" style="max-width: 400px; color: rgba(255,255,255,0.8);">
+                <h3 style="color: var(--mint); margin-top: 0;"><i class="fas fa-plane-departure" style="margin-right: 8px;"></i>TravelMate</h3>
+                <p>TravelMate helps travellers plan, compare, and book complete trips from one place with a modern, seamless experience.</p>
+            </div>
+            <div class="footer-social" style="display: flex; gap: 15px; font-size: 1.2rem;">
+                <a href="#" style="color: rgba(255,255,255,0.6); transition: color 0.3s;"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" style="color: rgba(255,255,255,0.6); transition: color 0.3s;"><i class="fab fa-twitter"></i></a>
+                <a href="#" style="color: rgba(255,255,255,0.6); transition: color 0.3s;"><i class="fab fa-instagram"></i></a>
+                <a href="#" style="color: rgba(255,255,255,0.6); transition: color 0.3s;"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="footer-stats" style="color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 8px; backdrop-filter: blur(5px);">
+                <p class="saved-count" data-saved-count style="margin: 0;"><i class="fas fa-heart" style="color: var(--coral);"></i> Saved trips: 0</p>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 30px; font-size: 0.85rem; color: rgba(255,255,255,0.4); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            &copy; {% now "Y" %} TravelMate. All rights reserved.
+        </div>
+    </footer>
+    <button class="back-to-top" type="button" data-back-to-top><i class="fas fa-chevron-up"></i></button>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends "travel/base.html" %}
+
+{% block title %}{{ transport.provider_name }} | TravelMate{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">Travel details</p>
+    <h1>{{ transport.source }} to {{ transport.destination.name }}</h1>
+    <p class="page-copy">{{ transport.get_transport_type_display }} by {{ transport.provider_name }}</p>
+</section>
+
+<section class="section">
+    <div class="info-grid">
+        <article>
+            <span>Departure</span>
+            <strong>{{ transport.departure_time }}</strong>
+        </article>
+        <article>
+            <span>Arrival</span>
+            <strong>{{ transport.arrival_time }}</strong>
+        </article>
+        <article>
+            <span>Seats</span>
+            <strong>{{ transport.seats_available }}</strong>
+        </article>
+        <article>
+            <span>Price</span>
+            <strong>INR {{ transport.price }}</strong>
+        </article>
+    </div>
+    <div class="center-actions">
+        <a class="primary-link" href="{% url 'book_trip' %}">Request this ticket</a>
+    </div>
+</section>
+{% endblock %}

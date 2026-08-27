@@ -1,0 +1,43 @@
+{% extends "travel/base.html" %}
+
+{% block title %}Holiday Packages | TravelMate{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">Holiday packages</p>
+    <h1>Pick a ready-made vacation</h1>
+    <div class="client-tools">
+        <input type="search" placeholder="Search package or place" data-card-search>
+        <select data-card-sort>
+            <option value="default">Recommended</option>
+            <option value="price-low">Price low to high</option>
+            <option value="name">Name A to Z</option>
+        </select>
+    </div>
+</section>
+
+<section class="section">
+    <div class="listing-grid" data-filter-grid>
+        {% for package in packages %}
+            <article class="listing-card tall" data-search-text="{{ package.title }} {{ package.destination.name }} {{ package.itinerary }}" data-name="{{ package.title }}" data-price="{{ package.price_per_person }}">
+                <img src="{{ package.image_url }}" alt="{{ package.title }}">
+                <div class="listing-body">
+                    <h3>{{ package.title }}</h3>
+                    <p>{{ package.destination.name }} - {{ package.duration_days }} days</p>
+                    <p>{{ package.itinerary }}</p>
+                    <p>
+                        {% if package.includes_hotel %}Hotel included{% endif %}
+                        {% if package.includes_transport %} - Transport included{% endif %}
+                    </p>
+                    <strong data-price-value="{{ package.price_per_person }}">INR {{ package.price_per_person }} / person</strong>
+                    <div class="card-actions">
+                        <a href="{% url 'package_detail' package.pk %}">View details</a>
+                        <a href="{% url 'book_trip' %}">Book package</a>
+                        <button type="button" data-save-trip="{{ package.title }}">Save</button>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

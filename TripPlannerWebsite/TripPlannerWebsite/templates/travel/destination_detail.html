@@ -1,0 +1,73 @@
+{% extends "travel/base.html" %}
+
+{% block title %}{{ destination.name }} | TravelMate{% endblock %}
+
+{% block content %}
+<section class="detail-hero">
+    <img src="{{ destination.image_url }}" alt="{{ destination.name }}">
+    <div>
+        <p class="eyebrow">Destination details</p>
+        <h1>{{ destination.name }}, {{ destination.country }}</h1>
+        <p>{{ destination.description }}</p>
+        <strong>Best season: {{ destination.best_season }}</strong>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Available options</p>
+            <h2>Plan {{ destination.name }}</h2>
+        </div>
+    </div>
+    <div class="listing-grid">
+        {% for hotel in hotels %}
+            <article class="listing-card">
+                <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}">
+                <div class="listing-body">
+                    <h3>{{ hotel.name }}</h3>
+                    <p>INR {{ hotel.price_per_night }} / night</p>
+                    <a href="{% url 'hotel_detail' hotel.pk %}">View hotel</a>
+                </div>
+            </article>
+        {% endfor %}
+        {% for package in packages %}
+            <article class="listing-card">
+                <img src="{{ package.image_url }}" alt="{{ package.title }}">
+                <div class="listing-body">
+                    <h3>{{ package.title }}</h3>
+                    <p>INR {{ package.price_per_person }} / person</p>
+                    <a href="{% url 'package_detail' package.pk %}">View package</a>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>Method</th>
+                    <th>Provider</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in transports %}
+                    <tr>
+                        <td>{{ item.source }}</td>
+                        <td>{{ item.get_transport_type_display }}</td>
+                        <td>{{ item.provider_name }}</td>
+                        <td><a class="table-link" href="{% url 'transport_detail' item.pk %}">INR {{ item.price }}</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">No transport options yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

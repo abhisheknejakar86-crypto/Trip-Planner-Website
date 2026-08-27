@@ -1,0 +1,225 @@
+{% extends "travel/base.html" %}
+
+{% block title %}Book Flights, Hotels and Holidays | TravelMate{% endblock %}
+
+{% block content %}
+{{ route_suggestions|json_script:"route-suggestions-data" }}
+{{ stay_suggestions|json_script:"stay-suggestions-data" }}
+{{ service_modes|json_script:"service-modes-data" }}
+
+<section class="booking-hero">
+    <div class="booking-shell">
+        <div class="service-tabs" role="tablist">
+            {% for tab in service_tabs %}
+                <button class="{% if forloop.first %}is-active{% endif %}" type="button" data-service-tab="{{ tab.key }}">
+                    <span class="service-icon service-icon-{{ tab.icon }}"></span>
+                    {{ tab.label }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <form class="route-search" method="get" action="{% url 'service_search' 'flights' %}" data-route-search data-search-root="/search/">
+            <div class="trip-type-row" data-route-only>
+                <label><input type="radio" name="trip_type" value="one-way" checked> One Way</label>
+                <label><input type="radio" name="trip_type" value="round-trip"> Round Trip</label>
+                <label><input type="radio" name="trip_type" value="multi-city"> Multi City</label>
+                <span>Domestic and international bookings</span>
+            </div>
+
+            <div class="route-grid" data-route-fields>
+                <label class="suggest-field">
+                    <span>From</span>
+                    <input name="from" value="New Delhi" placeholder="City or airport" autocomplete="off" data-suggest-input data-suggest-type="route">
+                    <small>Choose departure city</small>
+                </label>
+                <button class="swap-route" type="button" data-swap-route aria-label="Swap from and to">&harr;</button>
+                <label class="suggest-field">
+                    <span>To</span>
+                    <input name="to" value="Bengaluru" placeholder="City, country, or airport" autocomplete="off" data-suggest-input data-suggest-type="route">
+                    <small>Choose arrival city</small>
+                </label>
+                <label class="date-choice">
+                    <span>Departure</span>
+                    <input name="depart" type="date" value="{{ today }}" data-date-input>
+                    <strong data-date-display>Today</strong>
+                    <small>Tap to choose a travel date</small>
+                </label>
+                <label class="date-choice">
+                    <span>Return</span>
+                    <input name="return" type="date" data-date-input>
+                    <strong data-date-display>Save more together</strong>
+                    <small>Book return with departure for paired-trip offers</small>
+                </label>
+                <label>
+                    <span>Travellers and Class</span>
+                    <select name="travel_class">
+                        <option>Economy</option>
+                        <option>Premium Economy</option>
+                        <option>Business</option>
+                        <option>First Class</option>
+                    </select>
+                    <input name="travellers" type="number" min="1" value="1">
+                </label>
+            </div>
+
+            <div class="stay-grid" data-stay-fields hidden>
+                <label class="suggest-field">
+                    <span>City, Property Name or Location</span>
+                    <input name="location" value="Goa" placeholder="Where do you want to stay?" autocomplete="off" data-suggest-input data-suggest-type="stay">
+                    <small>Hotels, villas, homestays and resorts</small>
+                </label>
+                <label class="date-choice">
+                    <span>Check-in</span>
+                    <input name="checkin" type="date" value="{{ today }}" data-date-input>
+                    <strong data-date-display>Today</strong>
+                    <small>Choose check-in date</small>
+                </label>
+                <label class="date-choice">
+                    <span>Check-out</span>
+                    <input name="checkout" type="date" data-date-input>
+                    <strong data-date-display>Select date</strong>
+                    <small>Unlock better stay offers</small>
+                </label>
+                <label>
+                    <span>Rooms and Guests</span>
+                    <select name="rooms">
+                        <option>1 Room 2 Adults</option>
+                        <option>1 Room 1 Adult</option>
+                        <option>2 Rooms 4 Adults</option>
+                        <option>Family stay</option>
+                    </select>
+                    <small>Recommended stay setup</small>
+                </label>
+            </div>
+
+            <div class="stay-grid" data-destination-fields hidden>
+                <label class="suggest-field">
+                    <span>Destination</span>
+                    <input name="location" value="Dubai" placeholder="Search destination or experience" autocomplete="off" data-suggest-input data-suggest-type="stay">
+                    <small>Packages, tours, attractions and cruises</small>
+                </label>
+                <label class="date-choice">
+                    <span>Start date</span>
+                    <input name="depart" type="date" value="{{ today }}" data-date-input>
+                    <strong data-date-display>Today</strong>
+                    <small>Choose journey start</small>
+                </label>
+                <label class="date-choice">
+                    <span>End date</span>
+                    <input name="return" type="date" data-date-input>
+                    <strong data-date-display>Flexible end</strong>
+                    <small>Longer holidays can unlock better deals</small>
+                </label>
+                <label>
+                    <span>Travellers</span>
+                    <input name="travellers" type="number" min="1" value="2">
+                    <small>People joining the trip</small>
+                </label>
+            </div>
+
+            <div class="fare-row" data-route-only>
+                <span>Fare type</span>
+                <label><input type="radio" name="fare" checked> Regular fares</label>
+                <label><input type="radio" name="fare"> Flexible fares</label>
+                <label><input type="radio" name="fare"> Business travel</label>
+                <label><input type="radio" name="fare"> Senior traveller</label>
+            </div>
+
+            <button class="search-submit" type="submit">Search</button>
+        </form>
+    </div>
+</section>
+
+<section class="dynamic-service-section">
+    <div class="service-promos">
+        {% for service, promos in service_promos.items %}
+            <div class="promo-grid {% if service == 'flights' %}is-active{% endif %}" data-promo-panel="{{ service }}">
+                {% for title, text in promos %}
+                    <article>
+                        <strong>{{ title }}</strong>
+                        <p>{{ text }}</p>
+                        <a href="{% url 'service_search' service %}">Explore</a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Popular destinations</p>
+            <h2>Domestic and international picks</h2>
+        </div>
+        <div class="client-tools">
+            <input type="search" placeholder="Filter cards" data-card-search>
+            <select data-card-sort>
+                <option value="default">Recommended</option>
+                <option value="name">Name A to Z</option>
+            </select>
+        </div>
+    </div>
+    <div class="card-grid" data-filter-grid>
+        {% for destination in destinations %}
+            <article class="image-card" data-search-text="{{ destination.name }} {{ destination.country }} {{ destination.best_season }}" data-name="{{ destination.name }}" data-price="0">
+                <img src="{{ destination.image_url }}" alt="{{ destination.name }}">
+                <div>
+                    <h3>{{ destination.name }}</h3>
+                    <p>{{ destination.description|truncatewords:20 }}</p>
+                    <span>{{ destination.best_season }}</span>
+                    <a class="text-link" href="{% url 'destination_detail' destination.pk %}">Explore destination</a>
+                </div>
+            </article>
+        {% empty %}
+            <p class="empty">No destinations available yet.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section split-band">
+    <div>
+        <p class="eyebrow">Stay options</p>
+        <h2>Hotels and villas built for every itinerary</h2>
+    </div>
+    <div class="listing-grid" data-filter-grid>
+        {% for hotel in hotels %}
+            <article class="listing-card" data-search-text="{{ hotel.name }} {{ hotel.destination.name }} {{ hotel.amenities }}" data-name="{{ hotel.name }}" data-price="{{ hotel.price_per_night }}">
+                <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}">
+                <div class="listing-body">
+                    <h3>{{ hotel.name }}</h3>
+                    <p>{{ hotel.destination.name }} - {{ hotel.star_rating }} star</p>
+                    <strong data-price-value="{{ hotel.price_per_night }}">INR {{ hotel.price_per_night }} / night</strong>
+                    <div class="card-actions">
+                        <a href="{% url 'hotel_detail' hotel.pk %}">View details</a>
+                        <a href="{% url 'book_trip' %}">Request booking</a>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section split-band">
+    <div>
+        <p class="eyebrow">Holiday packages</p>
+        <h2>Ready-made trips across India and abroad</h2>
+    </div>
+    <div class="listing-grid" data-filter-grid>
+        {% for package in packages %}
+            <article class="listing-card" data-search-text="{{ package.title }} {{ package.destination.name }}" data-name="{{ package.title }}" data-price="{{ package.price_per_person }}">
+                <img src="{{ package.image_url }}" alt="{{ package.title }}">
+                <div class="listing-body">
+                    <h3>{{ package.title }}</h3>
+                    <p>{{ package.duration_days }} days in {{ package.destination.name }}</p>
+                    <strong data-price-value="{{ package.price_per_person }}">INR {{ package.price_per_person }} / person</strong>
+                    <div class="card-actions">
+                        <a href="{% url 'package_detail' package.pk %}">View details</a>
+                        <a href="{% url 'book_trip' %}">Book package</a>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

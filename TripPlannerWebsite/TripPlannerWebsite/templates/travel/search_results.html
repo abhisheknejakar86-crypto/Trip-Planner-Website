@@ -1,0 +1,242 @@
+{% extends "travel/base.html" %}
+
+{% block title %}Search {{ active_tab.label }} | TravelMate{% endblock %}
+
+{% block content %}
+<section class="results-topbar">
+    <datalist id="city-suggestions">
+        {% for city in city_suggestions %}
+            <option value="{{ city }}"></option>
+        {% endfor %}
+    </datalist>
+    <div class="mini-tabs">
+        {% for tab in service_tabs %}
+            <a class="{% if tab.key == active_tab.key %}is-active{% endif %}" href="{% url 'service_search' tab.key %}?from={{ from_city }}&to={{ to_city }}">
+                <span class="mini-icon service-icon-{{ tab.icon }}"></span>{{ tab.label }}
+            </a>
+        {% endfor %}
+    </div>
+    <form class="compact-search" method="get">
+        {% if active_tab.key == "hotels" or active_tab.key == "villas" %}
+            <label>
+                <span>Location</span>
+                <input name="location" value="{{ location }}" list="city-suggestions">
+            </label>
+            <label>
+                <span>Check-in</span>
+                <input name="checkin" type="date" value="{{ depart|default:today }}">
+            </label>
+            <label>
+                <span>Check-out</span>
+                <input name="checkout" type="date" value="{{ return_date }}">
+            </label>
+        {% elif active_tab.kind == "package" %}
+            <label>
+                <span>Destination</span>
+                <input name="location" value="{{ location }}" list="city-suggestions">
+            </label>
+            <label>
+                <span>Start date</span>
+                <input name="depart" type="date" value="{{ depart|default:today }}">
+            </label>
+            <label>
+                <span>End date</span>
+                <input name="return" type="date" value="{{ return_date }}">
+            </label>
+        {% else %}
+            <label>
+                <span>From</span>
+                <input name="from" value="{{ from_city }}" list="city-suggestions">
+            </label>
+            <label>
+                <span>To</span>
+                <input name="to" value="{{ to_city }}" list="city-suggestions">
+            </label>
+            <label>
+                <span>Depart</span>
+                <input name="depart" type="date" value="{{ depart|default:today }}">
+            </label>
+        {% endif %}
+        <label>
+            <span>Travellers</span>
+            <input name="travellers" type="number" min="1" value="{{ travellers }}">
+        </label>
+        <button type="submit">Search</button>
+    </form>
+</section>
+
+<section class="results-layout">
+    <aside class="filters-panel">
+        <div class="filter-heading">
+            <h2>Filters</h2>
+            <a href="{% url 'service_search' active_tab.key %}?from={{ from_city }}&to={{ to_city }}">Clear all</a>
+        </div>
+        <form method="get">
+            <input type="hidden" name="from" value="{{ from_city }}">
+            <input type="hidden" name="to" value="{{ to_city }}">
+            <input type="hidden" name="location" value="{{ location }}">
+            <input type="hidden" name="depart" value="{{ depart }}">
+            <input type="hidden" name="travellers" value="{{ travellers }}">
+
+            <div class="filter-checks">
+                <p>Popular filters</p>
+                <label><input type="checkbox" checked> Recommended</label>
+                <label><input type="checkbox"> Refundable</label>
+                <label><input type="checkbox"> Instant confirmation</label>
+                {% if active_tab.kind == "transport" %}
+                    <label><input type="checkbox"> Non stop</label>
+                    <label><input type="checkbox"> Morning departure</label>
+                {% else %}
+                    <label><input type="checkbox"> Breakfast included</label>
+                    <label><input type="checkbox"> Pay later</label>
+                {% endif %}
+            </div>
+
+            <div class="filter-checks">
+                <p>{% if active_tab.kind == "hotel" %}Price per night{% else %}Price{% endif %}</p>
+                <label><input type="radio" name="max_price" value="" {% if not max_price %}checked{% endif %}> Any budget</label>
+                <label><input type="radio" name="max_price" value="2500" {% if max_price == "2500" %}checked{% endif %}> Up to INR 2,500</label>
+                <label><input type="radio" name="max_price" value="8000" {% if max_price == "8000" %}checked{% endif %}> Up to INR 8,000</label>
+                <label><input type="radio" name="max_price" value="15000" {% if max_price == "15000" %}checked{% endif %}> Up to INR 15,000</label>
+                <label><input type="radio" name="max_price" value="50000" {% if max_price == "50000" %}checked{% endif %}> Up to INR 50,000</label>
+                <label><input type="radio" name="max_price" value="150000" {% if max_price == "150000" %}checked{% endif %}> Premium options</label>
+            </div>
+
+            {% if active_tab.kind == "transport" %}
+                <div class="filter-checks">
+                    <p>Operators</p>
+                    {% for provider_name in provider_options %}
+                        <label><input type="radio" name="provider" value="{{ provider_name }}" {% if selected_provider == provider_name %}checked{% endif %}> {{ provider_name }}</label>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="filter-checks">
+                    <p>Rating and stay type</p>
+                    <label><input type="checkbox"> 5 star</label>
+                    <label><input type="checkbox"> 4 star</label>
+                    <label><input type="checkbox"> Excellent 4.2+</label>
+                    <label><input type="checkbox"> Premium recommended</label>
+                </div>
+            {% endif %}
+
+            <div class="filter-checks">
+                <p>Sort</p>
+                <label><input type="radio" name="sort" value="price" {% if selected_sort == "price" %}checked{% endif %}> Lowest price</label>
+                <label><input type="radio" name="sort" value="time" {% if selected_sort == "time" %}checked{% endif %}> Earliest time</label>
+                <label><input type="radio" name="sort" value="rating" {% if selected_sort == "rating" %}checked{% endif %}> Best rated</label>
+            </div>
+
+            <button type="submit">Apply filters</button>
+        </form>
+    </aside>
+
+    <div class="results-main">
+        <div class="results-heading">
+            <div>
+                <p class="eyebrow">{{ active_tab.label }}</p>
+                {% if active_tab.key == "hotels" or active_tab.key == "villas" %}
+                    <h1>{{ active_tab.label }} in {{ location }}</h1>
+                {% elif active_tab.kind == "package" %}
+                    <h1>{{ active_tab.label }} for {{ location }}</h1>
+                {% else %}
+                    <h1>{{ active_tab.label }} from {{ from_city }} to {{ to_city }}</h1>
+                {% endif %}
+                <p>{{ travellers }} traveller(s){% if depart %} - departing {{ depart }}{% endif %}</p>
+            </div>
+            {% if price_min %}
+                <strong>Starting from INR {{ price_min }}</strong>
+            {% endif %}
+        </div>
+
+        <div class="result-sort-strip">
+            <article class="is-active"><strong>Cheapest</strong><span>{% if price_min %}INR {{ price_min }}{% else %}Best fare{% endif %}</span></article>
+            <article><strong>Non stop first</strong><span>Fastest direct choices</span></article>
+            <article><strong>You may prefer</strong><span>Popular with travellers</span></article>
+            <article><strong>Premium picks</strong><span>Higher comfort options</span></article>
+        </div>
+
+        <div class="promo-grid results-promos">
+            {% for service, promos in service_promos.items %}
+                {% if service == active_tab.key %}
+                    {% for title, text in promos %}
+                        <article>
+                            <strong>{{ title }}</strong>
+                            <p>{{ text }}</p>
+                        </article>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% for item in results %}
+            {% if active_tab.kind == "transport" %}
+                <article class="result-card flight-card">
+                    <div class="carrier-mark">{{ item.provider_name|slice:":1" }}</div>
+                    <div class="carrier-info">
+                        <h2>{{ item.provider_name }}</h2>
+                        <p>{{ item.get_transport_type_display }} {{ item.id }}{{ item.seats_available }}</p>
+                        <a href="#">Add to compare +</a>
+                    </div>
+                    <div class="route-times">
+                        <strong>{{ item.departure_time }}</strong>
+                        <span>{{ item.source }}</span>
+                    </div>
+                    <div class="route-line">
+                        <span></span>
+                        <small>Direct option</small>
+                    </div>
+                    <div class="route-times">
+                        <strong>{{ item.arrival_time }}</strong>
+                        <span>{{ item.destination.name }}</span>
+                    </div>
+                    <div class="result-price">
+                        <small>92% on time</small>
+                        <strong>INR {{ item.price }}</strong>
+                        <span>{{ item.seats_available }} seats left</span>
+                        <a href="{% url 'transport_detail' item.pk %}">View prices</a>
+                    </div>
+                    <div class="offer-band">Flat instant discount on selected cards and wallet payments</div>
+                </article>
+            {% elif active_tab.kind == "hotel" %}
+                <article class="result-card hotel-result property-card">
+                    <img src="{{ item.image_url }}" alt="{{ item.name }}">
+                    <div>
+                        <h2>{{ item.name }} <span>{{ item.star_rating }} star</span></h2>
+                        <p>{{ item.destination.name }} - {{ item.address }}</p>
+                        <p class="pill-line">Couple friendly</p>
+                        <p>Breakfast included - {{ item.amenities }}</p>
+                        <p class="property-offer">Special member deal available today</p>
+                    </div>
+                    <div class="result-price">
+                        <small>Excellent 4.3</small>
+                        <strong>INR {{ item.price_per_night }}</strong>
+                        <span>per night</span>
+                        <a href="{% url 'hotel_detail' item.pk %}">View rooms</a>
+                    </div>
+                </article>
+            {% elif active_tab.kind == "package" %}
+                <article class="result-card hotel-result property-card">
+                    <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                    <div>
+                        <h2>{{ item.title }}</h2>
+                        <p>{{ item.destination.name }} - {{ item.duration_days }} days</p>
+                        <p>{{ item.itinerary|truncatewords:24 }}</p>
+                        <p class="property-offer">Hotel, transfer and activity options included</p>
+                    </div>
+                    <div class="result-price">
+                        <small>Most preferred</small>
+                        <strong>INR {{ item.price_per_person }}</strong>
+                        <span>per person</span>
+                        <a href="{% url 'package_detail' item.pk %}">View package</a>
+                    </div>
+                </article>
+            {% endif %}
+        {% empty %}
+            <div class="support-panel">
+                <h2>No results found</h2>
+                <p>Try another destination or clear the filters to see more options.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

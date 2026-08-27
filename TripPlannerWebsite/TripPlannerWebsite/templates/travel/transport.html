@@ -1,0 +1,59 @@
+{% extends "travel/base.html" %}
+
+{% block title %}Travel Methods | TravelMate{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">Ticket booking</p>
+    <h1>Plan how you will reach</h1>
+    <div class="client-tools">
+        <input type="search" placeholder="Search route or provider" data-table-search>
+        <select data-transport-filter>
+            <option value="">All methods</option>
+            <option value="plane">Plane</option>
+            <option value="train">Train</option>
+            <option value="bus">Bus</option>
+            <option value="cab">Cab</option>
+        </select>
+    </div>
+</section>
+
+<section class="section">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Method</th>
+                    <th>Provider</th>
+                    <th>Departure</th>
+                    <th>Arrival</th>
+                    <th>Seats</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in transports %}
+                    <tr data-row-text="{{ item.source }} {{ item.destination.name }} {{ item.provider_name }} {{ item.get_transport_type_display }}" data-method="{{ item.transport_type }}">
+                        <td>{{ item.source }}</td>
+                        <td>{{ item.destination.name }}</td>
+                        <td>{{ item.get_transport_type_display }}</td>
+                        <td>{{ item.provider_name }}</td>
+                        <td>{{ item.departure_time }}</td>
+                        <td>{{ item.arrival_time }}</td>
+                        <td>{{ item.seats_available }}</td>
+                        <td>
+                            INR {{ item.price }}
+                            <a class="table-link" href="{% url 'transport_detail' item.pk %}">Details</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="center-actions">
+        <a class="primary-link" href="{% url 'book_trip' %}">Request tickets</a>
+    </div>
+</section>
+{% endblock %}

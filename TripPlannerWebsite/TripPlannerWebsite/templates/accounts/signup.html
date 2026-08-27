@@ -1,0 +1,27 @@
+{% extends "travel/base.html" %}
+
+{% block title %}Create Account | TravelMate{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">Traveller account</p>
+    <h1>Create your private trip space</h1>
+    <p class="page-copy">Your bookings and browsing history stay attached to your own login.</p>
+</section>
+
+<section class="auth-section">
+    <form class="auth-form" method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <label>
+                <span>{{ field.label }}</span>
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% if field.errors %}<small>{{ field.errors|striptags }}</small>{% endif %}
+            </label>
+        {% endfor %}
+        <button type="submit">Create Account</button>
+        <p>Already registered? <a href="{% url 'login' %}">Login here</a>.</p>
+    </form>
+</section>
+{% endblock %}

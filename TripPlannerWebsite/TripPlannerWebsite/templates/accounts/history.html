@@ -1,0 +1,58 @@
+{% extends "travel/base.html" %}
+
+{% block title %}My History | TravelMate{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">Private dashboard</p>
+    <h1>{{ user.username }}'s trip history</h1>
+    <p class="page-copy">Only your account can see these bookings and explored plans.</p>
+</section>
+
+<section class="section split-band">
+    <div>
+        <p class="eyebrow">Bookings</p>
+        <h2>Your booked plans</h2>
+    </div>
+    <div class="history-list">
+        {% for booking in bookings %}
+            <article class="history-card">
+                <h3>{{ booking.get_booking_type_display }} for {{ booking.destination.name }}</h3>
+                <p>{{ booking.travelers }} traveler(s) - {{ booking.created_at|date:"d M Y, h:i A" }}</p>
+                {% if booking.hotel %}<p>Hotel: {{ booking.hotel.name }}</p>{% endif %}
+                {% if booking.transport %}<p>Travel: {{ booking.transport.provider_name }}</p>{% endif %}
+                {% if booking.holiday_package %}<p>Package: {{ booking.holiday_package.title }}</p>{% endif %}
+            </article>
+        {% empty %}
+            <p class="empty">No bookings yet. Start with the booking form when you are ready.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Explored</p>
+            <h2>Plans you browsed</h2>
+        </div>
+    </div>
+    <div class="listing-grid">
+        {% for item in browsed_items %}
+            <article class="listing-card">
+                {% if item.image_url %}
+                    <img src="{{ item.image_url }}" alt="{{ item.item_name }}">
+                {% endif %}
+                <div class="listing-body">
+                    <h3>{{ item.item_name }}</h3>
+                    <p>{{ item.get_item_type_display }}{% if item.destination_name %} - {{ item.destination_name }}{% endif %}</p>
+                    {% if item.price %}<strong>INR {{ item.price }}</strong>{% endif %}
+                    <p>{{ item.notes }}</p>
+                    <small>{{ item.viewed_at|date:"d M Y, h:i A" }}</small>
+                </div>
+            </article>
+        {% empty %}
+            <p class="empty">Open a hotel, package, transport, or destination detail page to build your explored history.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "travel/base.html" %}
+
+{% block title %}{{ package.title }} | TravelMate{% endblock %}
+
+{% block content %}
+<section class="detail-hero">
+    <img src="{{ package.image_url }}" alt="{{ package.title }}">
+    <div>
+        <p class="eyebrow">Package details</p>
+        <h1>{{ package.title }}</h1>
+        <p>{{ package.duration_days }} days in {{ package.destination.name }}</p>
+        <strong>INR {{ package.price_per_person }} / person</strong>
+        <p>{{ package.itinerary }}</p>
+        <p>
+            {% if package.includes_hotel %}Hotel included{% endif %}
+            {% if package.includes_transport %} - Transport included{% endif %}
+        </p>
+        <a class="primary-link" href="{% url 'book_trip' %}">Book this package</a>
+    </div>
+</section>
+{% endblock %}

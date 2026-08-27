@@ -1,0 +1,7 @@
+<svg width="150" height="44" viewBox="0 0 150 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="1" y="1" width="42" height="42" rx="8" fill="#0F8F72"/>
+  <path d="M9 27L34 10L27 34L21 25L9 27Z" fill="white"/>
+  <path d="M21 25L17 36L24 29" fill="#E5B843"/>
+  <text x="51" y="19" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="800" fill="#172026">Travel</text>
+  <text x="51" y="36" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="800" fill="#D95F43">Mate</text>
+</svg>

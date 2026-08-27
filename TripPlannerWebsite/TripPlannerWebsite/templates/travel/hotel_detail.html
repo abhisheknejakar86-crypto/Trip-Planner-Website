@@ -1,0 +1,18 @@
+{% extends "travel/base.html" %}
+
+{% block title %}{{ hotel.name }} | TravelMate{% endblock %}
+
+{% block content %}
+<section class="detail-hero">
+    <img src="{{ hotel.image_url }}" alt="{{ hotel.name }}">
+    <div>
+        <p class="eyebrow">Hotel details</p>
+        <h1>{{ hotel.name }}</h1>
+        <p>{{ hotel.address }}, {{ hotel.destination.name }}</p>
+        <strong>INR {{ hotel.price_per_night }} / night</strong>
+        <p>{{ hotel.star_rating }} star - {{ hotel.rooms_available }} rooms available</p>
+        <p>{{ hotel.amenities }}</p>
+        <a class="primary-link" href="{% url 'book_trip' %}">Request this stay</a>
+    </div>
+</section>
+{% endblock %}
